@@ -34,21 +34,16 @@ jobs:
         run: |
           mkdir sdk
           ln -s ${ANDROID_HOME} ./sdk/android-sdk-linux
-      - name: Bundle (default)
-        working-directory: ./buildscripts
-        run: |
-          sudo chmod +x bundle_default.sh
-          ./bundle_default.sh
+      # HIBIKI FORK: Hibiki ships only the `full` flavor (media_kit_libs_android_video
+      # points at full-<abi>.jar; the default flavor omits the truehd/mlp decoder,
+      # see BUG-073). Each bundle_*.sh wipes deps/ and rebuilds the whole chain from
+      # scratch, so building the two unused flavors triples the job for artifacts we
+      # discard, and any failure in them fails the run that produced our jars.
       - name: Bundle (full)
         working-directory: ./buildscripts
         run: |
           sudo chmod +x bundle_full.sh
           ./bundle_full.sh
-      - name: Bundle (encoders-gpl)
-        working-directory: ./buildscripts
-        run: |
-          sudo chmod +x bundle_encoders-gpl.sh
-          ./bundle_encoders-gpl.sh
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
